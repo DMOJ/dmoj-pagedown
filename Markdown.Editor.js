@@ -1633,15 +1633,15 @@
 
         // Look for stars before and after.  Is the chunk already marked up?
         // note that these regex matches cannot fail
-		var starsBefore = /(\${2}*$)/.exec(chunk.before)[0];
-        var starsAfter = /(^\${2}*)/.exec(chunk.after)[0];
+		var starsBefore = /((?:\${2})*$)/.exec(chunk.before)[0];
+        var starsAfter = /(^(?:\${2})*)/.exec(chunk.after)[0];
 
         var prevStars = Math.min(starsBefore.length, starsAfter.length);
 
         if (!chunk.selection && starsAfter) {
             // It's not really clear why this code is necessary.  It just moves
             // some arbitrary stuff around.
-            chunk.after = chunk.after.replace(/^(\${2})/, "");
+            chunk.after = chunk.after.replace(/^((?:\${2}))/, "");
             chunk.before = chunk.before.replace(/(\s?)$/, "");
             var whitespace = re.$1;
             chunk.before = chunk.before + starsAfter + whitespace;
@@ -1653,7 +1653,7 @@
             }
 
             // Add the true markup.
-            var markup = "$$"; // shouldn't the test be = ?
+            var markup = ""; // shouldn't the test be = ?
             chunk.before = chunk.before + markup;
             chunk.after = markup + chunk.after;
         }
