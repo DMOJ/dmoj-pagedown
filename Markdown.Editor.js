@@ -1590,7 +1590,7 @@
 
         // Look for stars before and after.  Is the chunk already marked up?
         // note that these regex matches cannot fail
-        var prevStars = Math.min(/(~$)/.exec(chunk.before)[0].length, /(^~)/.exec(chunk.after)[0].length);
+        var prevStars = Math.min(/(~*$)/.exec(chunk.before)[0].length, /(^~*)/.exec(chunk.after)[0].length);
 
         if (!chunk.selection && starsAfter) {
             // It's not really clear why this code is necessary.  It just moves
