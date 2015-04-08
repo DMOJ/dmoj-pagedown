@@ -1,4 +1,4 @@
-﻿// needs Markdown.Converter.js at the moment
+// needs Markdown.Converter.js at the moment
 
 (function () {
 
@@ -23,10 +23,13 @@
 
         italic: "Emphasis <em> Ctrl+I",
         italicexample: "emphasized text",
+		
+		latex: "Latex embed - Ctrl + M",
+		latexexample: "x^2",
 
         link: "Hyperlink <a> Ctrl+L",
         linkdescription: "enter link description here",
-        linkdialog: "<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>",
+        linkdialog: "<p><b>Insert Hyperlink</b></p><p>https://dmoj.ca/ \"optional title\"</p>",
 
         quote: "Blockquote <blockquote> Ctrl+Q",
         quoteexample: "Blockquote",
@@ -36,7 +39,7 @@
 
         image: "Image <img> Ctrl+G",
         imagedescription: "enter image description here",
-        imagedialog: "<p><b>Insert Image</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br>Need <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a></p>",
+        imagedialog: "<p><b>Insert Image</b></p><p>https://dmoj.ca/logo.png \"optional title\"<br><br>Need <a href='http://www.google.com/search?q=free+image+hosting' target='_blank'>free image hosting?</a></p>",
 
         olist: "Numbered List <ol> Ctrl+O",
         ulist: "Bulleted List <ul> Ctrl+U",
@@ -1260,6 +1263,9 @@
                     case "l":
                         doClick(buttons.link);
                         break;
+					case "m":
+						doClick(buttons.latex);
+						break;
                     case "q":
                         doClick(buttons.quote);
                         break;
@@ -1483,32 +1489,34 @@
             buttons.bold = makeButton("wmd-bold-button", getString("bold"), "0px", bindCommand("doBold"));
             buttons.italic = makeButton("wmd-italic-button", getString("italic"), "-20px", bindCommand("doItalic"));
             makeSpacer(1);
-            buttons.link = makeButton("wmd-link-button", getString("link"), "-40px", bindCommand(function (chunk, postProcessing) {
+            buttons.latex = makeButton("wmd-latex-button", getString("latex"), "-40px", bindCommand("doLatex"));
+            makeSpacer(2);
+            buttons.link = makeButton("wmd-link-button", getString("link"), "-60px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
             }));
-            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-60px", bindCommand("doBlockquote"));
-            buttons.code = makeButton("wmd-code-button", getString("code"), "-80px", bindCommand("doCode"));
-            buttons.image = makeButton("wmd-image-button", getString("image"), "-100px", bindCommand(function (chunk, postProcessing) {
+            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-80px", bindCommand("doBlockquote"));
+            buttons.code = makeButton("wmd-code-button", getString("code"), "-100px", bindCommand("doCode"));
+            buttons.image = makeButton("wmd-image-button", getString("image"), "-120px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, true);
             }));
-            makeSpacer(2);
-            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-120px", bindCommand(function (chunk, postProcessing) {
+            makeSpacer(3);
+            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-140px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-140px", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-160px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-160px", bindCommand("doHeading"));
-            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-180px", bindCommand("doHorizontalRule"));
+            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-180px", bindCommand("doHeading"));
+            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-200px", bindCommand("doHorizontalRule"));
             makeSpacer(3);
-            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-200px", null);
+            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-220px", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 getString("redo") :
                 getString("redomac"); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton("wmd-redo-button", redoTitle, "-220px", null);
+            buttons.redo = makeButton("wmd-redo-button", redoTitle, "-240px", null);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {
@@ -1517,7 +1525,7 @@
                 helpButton.appendChild(helpButtonImage);
                 helpButton.className = "wmd-button wmd-help-button";
                 helpButton.id = "wmd-help-button" + postfix;
-                helpButton.XShift = "-240px";
+                helpButton.XShift = "-260px";
                 helpButton.isHelp = true;
                 helpButton.style.right = "0px";
                 helpButton.title = getString("help");
@@ -1573,6 +1581,40 @@
         chunk.selection = chunk.selection.replace(/\s+$/, "");
     };
 
+	commandProto.doLatex = function (chunk, postProcessing) {
+		/* This section is almost identical to doBorI below */
+		
+        // Get rid of whitespace and fixup newlines.
+        chunk.trimWhitespace();
+        chunk.selection = chunk.selection.replace(/\n{2,}/g, "\n");
+
+        // Look for stars before and after.  Is the chunk already marked up?
+        // note that these regex matches cannot fail
+        var prevStars = Math.min(/(~$)/.exec(chunk.before)[0].length, /(^~)/.exec(chunk.after)[0].length);
+
+        if (!chunk.selection && starsAfter) {
+            // It's not really clear why this code is necessary.  It just moves
+            // some arbitrary stuff around.
+            chunk.after = chunk.after.replace(/^(~)/, "");
+            chunk.before = chunk.before.replace(/(\s?)$/, "");
+            var whitespace = re.$1;
+            chunk.before = chunk.before + starsAfter + whitespace;
+        } else {
+            // In most cases, if you don't have any selected text and click the button
+            // you'll get a selected, marked up region with the default text inserted.
+            if (!chunk.selection && !starsAfter) {
+                chunk.selection = this.getString("latexexample");
+            }
+
+            // Add the true markup.
+            var markup = "~"; // shouldn't the test be = ?
+            chunk.before = chunk.before + markup;
+            chunk.after = markup + chunk.after;
+        }
+
+        return;
+	};
+	
     commandProto.doBold = function (chunk, postProcessing) {
         return this.doBorI(chunk, postProcessing, 2, this.getString("boldexample"));
     };
