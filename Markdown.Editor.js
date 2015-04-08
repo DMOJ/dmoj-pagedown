@@ -1653,7 +1653,7 @@
             }
 
             // Add the true markup.
-            var markup = ""; // shouldn't the test be = ?
+            var markup = "$$"; // shouldn't the test be = ?
             chunk.before = chunk.before + markup;
             chunk.after = markup + chunk.after;
         }
