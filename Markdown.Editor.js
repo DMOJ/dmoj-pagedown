@@ -24,14 +24,17 @@
         italic: "Emphasis <em> Ctrl+I",
         italicexample: "emphasized text",
 		
-		latex: "Latex embed - Ctrl + M",
+		latex: "Latex embed - Ctrl+M",
 		latexexample: "x^2",
-		latexdisplay: "Latex display embed - Ctrl + Space",
+		latexdisplay: "Latex display embed - Ctrl+Space",
 		latexdisplayexample: "f(x)=x^2",
 
         link: "Hyperlink <a> Ctrl+L",
         linkdescription: "enter link description here",
         linkdialog: "<p><b>Insert Hyperlink</b></p><p>https://dmoj.ca/ \"optional title\"</p>",
+
+        user: "User reference",
+        userexample: "enter username here",
 
         quote: "Blockquote <blockquote> Ctrl+Q",
         quoteexample: "Blockquote",
@@ -406,7 +409,7 @@
         pattern = pre + pattern + post;
 
         return new re(pattern, flags);
-    }
+    };
 
     // UNFINISHED
     // The assignment in the while loop makes jslint cranky.
@@ -1500,29 +1503,32 @@
             buttons.link = makeButton("wmd-link-button", getString("link"), "-80px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
             }));
-            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-100px", bindCommand("doBlockquote"));
-            buttons.code = makeButton("wmd-code-button", getString("code"), "-120px", bindCommand("doCode"));
-            buttons.image = makeButton("wmd-image-button", getString("image"), "-140px", bindCommand(function (chunk, postProcessing) {
+
+            buttons.user = makeButton("wmd-user-reference-button", getString("user"), "-100px", bindCommand("doUserReference"));
+
+            buttons.quote = makeButton("wmd-quote-button", getString("quote"), "-120px", bindCommand("doBlockquote"));
+            buttons.code = makeButton("wmd-code-button", getString("code"), "-140px", bindCommand("doCode"));
+            buttons.image = makeButton("wmd-image-button", getString("image"), "-160px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, true);
             }));
             makeSpacer(3);
-            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-160px", bindCommand(function (chunk, postProcessing) {
+            buttons.olist = makeButton("wmd-olist-button", getString("olist"), "-180px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-180px", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton("wmd-ulist-button", getString("ulist"), "-200px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-200px", bindCommand("doHeading"));
-            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-220px", bindCommand("doHorizontalRule"));
+            buttons.heading = makeButton("wmd-heading-button", getString("heading"), "-220px", bindCommand("doHeading"));
+            buttons.hr = makeButton("wmd-hr-button", getString("hr"), "-240px", bindCommand("doHorizontalRule"));
             makeSpacer(3);
-            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-240px", null);
+            buttons.undo = makeButton("wmd-undo-button", getString("undo"), "-260px", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
                 getString("redo") :
                 getString("redomac"); // mac and other non-Windows platforms
 
-            buttons.redo = makeButton("wmd-redo-button", redoTitle, "-260px", null);
+            buttons.redo = makeButton("wmd-redo-button", redoTitle, "-280px", null);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
 
             if (helpOptions) {
@@ -1531,7 +1537,7 @@
                 helpButton.appendChild(helpButtonImage);
                 helpButton.className = "wmd-button wmd-help-button";
                 helpButton.id = "wmd-help-button" + postfix;
-                helpButton.XShift = "-280px";
+                helpButton.XShift = "-300px";
                 helpButton.isHelp = true;
                 helpButton.style.right = "0px";
                 helpButton.title = getString("help");
@@ -1807,6 +1813,12 @@
             return title ? link + ' "' + title + '"' : link;
         });
     }
+
+    commandProto.doUserReference = function (chunk, postProcessing) {
+        chunk.before = "[user:";
+        chunk.after = "]";
+        return true;
+    };
 
     commandProto.doLinkOrImage = function (chunk, postProcessing, isImage) {
 
