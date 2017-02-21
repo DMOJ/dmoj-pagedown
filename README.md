@@ -3,7 +3,7 @@ pagedown
 
 A clone of the Google code repository for StackOverflow&#39;s pagedown markdown editor.
 
-This fork is intended to be used for [the site component of Don Mills Online Judge](https://github.com/DMOJ/site).
+This fork is intended to be used for [the site component of DMOJ: Modern Online Judge](https://github.com/DMOJ/site).
 We add features specifically for our own use. If you find these features useful, feel free to use this repository
 at your own peril, as we offer no support.
 
