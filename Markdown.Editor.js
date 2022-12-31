@@ -1816,7 +1816,7 @@
 
     commandProto.doUserReference = function (chunk, postProcessing) {
         chunk.before = chunk.before + "[user:";
-        chunk.after = chunk.after + "]";
+        chunk.after = "]" + chunk.after;
         if (!chunk.selection) {
             chunk.selection = this.getString("userexample");
         }
